@@ -1,0 +1,55 @@
+<form [formGroup]="currencyConverterGroup">
+  <mat-form-field class="converter__form-input" appearance="outline">
+    <mat-label>Amount</mat-label>
+    <input matInput formControlName="amountControl" [errorStateMatcher]="matcher" placeholder="Amount" (blur)="setInitialValue()">
+    <mat-error *ngIf="this.currencyConverterGroup.controls['amountControl'].invalid">
+      Amount should not be empty and should have correct format
+    </mat-error>
+  </mat-form-field>
+  <div class="converter__wrapper" [class.converter__wrapper--inverted]="isInverted">
+    <div class="converter__form-col">
+      <mat-form-field appearance="outline">
+        <mat-label>From</mat-label>
+        <input type="text"
+               placeholder="From"
+               formControlName="sourceCurrencyControl"
+               matInput
+               [matAutocomplete]="sourceMatAutocomplete">
+        <mat-autocomplete #sourceMatAutocomplete="matAutocomplete" (optionSelected)="convertIt()">
+          <mat-option *ngFor="let option of sourceFilteredOptions" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+    <button class="converter__form-invert-btn" mat-mini-fab (click)="invertCurrencies()" color="accent" aria-label="Replace fields">
+      <mat-icon>compare_arrows</mat-icon>
+    </button>
+    <div class="converter__form-col">
+      <mat-form-field appearance="outline">
+        <mat-label>To</mat-label>
+        <input type="text"
+          placeholder="To"
+          formControlName="targetCurrencyControl"
+          matInput
+          [matAutocomplete]="targetMatAutocomplete">
+        <mat-autocomplete #targetMatAutocomplete="matAutocomplete" (optionSelected)="convertIt()">
+          <mat-option *ngFor="let option of targetFilteredOptions" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </div>
+  <ng-container *ngIf="conversionResult && this.currencyConverterGroup.controls['amountControl'].valid">
+    <p class="converter__source-value">
+      {{ this.currencyConverterGroup.controls['amountControl'].value | currency }} {{ isInverted ? currencyConverterGroup.controls['targetCurrencyControl'].value : currencyConverterGroup.controls['sourceCurrencyControl'].value }} =
+    </p>
+    <p class="converter__result">
+      {{ conversionResult | currency }} {{ isInverted ? currencyConverterGroup.controls['sourceCurrencyControl'].value : currencyConverterGroup.controls['targetCurrencyControl'].value }}
+    </p>
+    <p class="converter__info">
+      1.00 {{ isInverted ? currencyConverterGroup.controls['targetCurrencyControl'].value : currencyConverterGroup.controls['sourceCurrencyControl'].value }} = {{ conversionResultOne }} {{ isInverted ? currencyConverterGroup.controls['sourceCurrencyControl'].value : currencyConverterGroup.controls['targetCurrencyControl'].value }}
+    </p>
+  </ng-container>
+</form>
